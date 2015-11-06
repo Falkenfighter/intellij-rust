@@ -3,7 +3,7 @@ package org.rust.lang.core.resolve.ref
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.PsiReferenceBase.EMPTY_ARRAY
+import org.rust.lang.core.resolve.RustCompletionEngine
 import org.rust.lang.core.resolve.RustResolveEngine
 
 public open class RustReference<T : RustQualifiedValue>(element: T,
@@ -11,7 +11,8 @@ public open class RustReference<T : RustQualifiedValue>(element: T,
                                                         soft: Boolean = false) :
         PsiReferenceBase<T>(element, range, soft) {
 
-    override fun getVariants(): Array<out Any> = EMPTY_ARRAY
+    override fun getVariants(): Array<out Any> =
+            RustCompletionEngine(this).complete()
 
     protected override fun calculateDefaultRangeInElement(): TextRange? =
             TextRange.from(0, myElement.textLength)
