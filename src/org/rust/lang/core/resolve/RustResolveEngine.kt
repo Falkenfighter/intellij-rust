@@ -2,7 +2,10 @@ package org.rust.lang.core.resolve
 
 import com.intellij.psi.PsiElement
 import org.rust.lang.core.psi.*
+import org.rust.lang.core.psi.util.ModuleFile
 import org.rust.lang.core.psi.util.isBefore
+import org.rust.lang.core.psi.util.parentModInFile
+import org.rust.lang.core.psi.util.submodulePath
 import org.rust.lang.core.resolve.scope.RustResolveScope
 import org.rust.lang.core.resolve.scope.resolveWith
 import org.rust.lang.core.resolve.util.RustResolveUtil
@@ -80,6 +83,14 @@ public class RustResolveEngine() {
 
         private fun found(elem: RustNamedElement) {
             matched = elem
+            if (elem is RustModDeclItem) {
+                val mod = elem.parentModInFile ?: return
+                val name = elem.name ?: return
+                val path = mod.submodulePath(name)
+                if (path is ModuleFile.Ok) {
+                    matched =  path.mod
+                }
+            }
         }
 
         private fun match(elem: RustNamedElement): Boolean =
